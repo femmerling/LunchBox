@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+		<h1>List of Transactions Entries.</h1>
+		<table id="list-view">
+			<thead>
+				<tr>
+					<td><b>ID</td>
+					<td><b>Amount</b></td>
+					<td><b>Payee</b></td>
+					<td><b>Payer</b></td>
+					<td><b>Description</b></td>
+					<td><b>Transaction_Time</b></td>
+					<td><b> </td>
+					<td><b> </td>
+				</tr>
+			</thead>
+			{% if transactions_entries %}
+			<tbody>
+			{% for entry in transactions_entries %}
+				<tr>
+					<td>{{ entry.transactions_id }}</td>
+					<td>{{ entry.amount }}</td>
+					<td>{{ entry.payee }}</td>
+					<td>{{ entry.payer }}</td>
+					<td>{{ entry.description }}</td>
+					<td>{{ entry.transaction_time }}</td>
+					<td><a href="/transactions/edit/{{ entry.transactions_id }}">Edit</a></td>
+					<td><a href="/transactions/delete/{{ entry.transactions_id }}">Delete</a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+			{% else %}
+		</table>
+		You have no entries yet
+			{% endif %}
+			<br/><br/><b><a id="actions" href="/transactions/add">Add new entry</a></b>
+{% endblock %}

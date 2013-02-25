@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+		<h1>List of User Entries.</h1>
+		<table id="list-view">
+			<thead>
+				<tr>
+					<td><b>ID</td>
+					<td><b>Email</b></td>
+					<td><b>Firstname</b></td>
+					<td><b>Lastname</b></td>
+					<td><b>Join_Date</b></td>
+					<td><b> </td>
+					<td><b> </td>
+				</tr>
+			</thead>
+			{% if user_entries %}
+			<tbody>
+			{% for entry in user_entries %}
+				<tr>
+					<td>{{ entry.user_id }}</td>
+					<td>{{ entry.email }}</td>
+					<td>{{ entry.firstname }}</td>
+					<td>{{ entry.lastname }}</td>
+					<td>{{ entry.join_date }}</td>
+					<td><a href="/user/edit/{{ entry.user_id }}">Edit</a></td>
+					<td><a href="/user/delete/{{ entry.user_id }}">Delete</a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+			{% else %}
+		</table>
+		You have no entries yet
+			{% endif %}
+			<br/><br/><b><a id="actions" href="/user/add">Add new entry</a></b>
+{% endblock %}

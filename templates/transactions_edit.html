@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+		<h1>Edit Transactions Entries.</h1>
+		<form name="transactions_add" method="post" action="/transactions/update/{{ transactions_item.transactions_id }}">
+		<table>
+				<tr>
+					<td>Amount:</td>
+					<td><input type="text" name="amount" value="{{ transactions_item.amount }}"/></td>
+				</tr>
+				<tr>
+					<td>Payee:</td>
+					<td><input type="text" name="payee" value="{{ transactions_item.payee }}"/></td>
+				</tr>
+				<tr>
+					<td>Payer:</td>
+					<td><input type="text" name="payer" value="{{ transactions_item.payer }}"/></td>
+				</tr>
+				<tr>
+					<td>Description:</td>
+					<td><input type="text" name="description" value="{{ transactions_item.description }}"/></td>
+				</tr>
+				<tr>
+					<td>Transaction_Time:</td>
+					<td><input type="text" name="transaction_time" value="{{ transactions_item.transaction_time }}"/></td>
+				</tr>
+				<tr>
+					<td><input type="submit" name="submit" value="Edit Entry"/></td>
+					<td> </td>
+				</tr>
+		</table>
+		</form>
+{% endblock %}
