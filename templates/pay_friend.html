@@ -1,0 +1,28 @@
+{% extends "base_login.html" %}
+{% block content %}
+		<h2>Pay Your friend!</h2>
+		<form name="transactions_pay" method="post" action="/pay/to/{{balance.payee}}">
+		<table>
+				<tr>
+					<td>Friend:</td>
+					<td>{{ balance.payee }}</td>
+				</tr>
+				<tr>
+					<td>Amount Owed:</td>
+					<td>{{ balance.amount }}</td>
+				</tr>
+				<tr>
+					<td>Amount to pay:</td>
+					<td><input type="text" name="amount"/></td>
+				</tr>
+				<tr>
+					<td>Description:</td>
+					<td><input type="text" name="description"/></td>
+				</tr>
+				<tr>
+					<td><input type="submit" name="submit" value="Pay!"/></td>
+					<td> </td>
+				</tr>
+		</table>
+		</form>
+{% endblock %}

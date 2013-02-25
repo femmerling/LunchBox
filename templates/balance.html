@@ -1,34 +1,29 @@
-{% extends "base.html" %}
+{% extends "base_login.html" %}
 {% block content %}
-		<h1>List of Balance Entries.</h1>
+		<h2>Your Balances</h2>
 		<table id="list-view">
 			<thead>
 				<tr>
-					<td><b>ID</td>
+					<td></td>
 					<td><b>Payee</b></td>
 					<td><b>Payer</b></td>
 					<td><b>Amount</b></td>
-					<td><b> </td>
-					<td><b> </td>
 				</tr>
 			</thead>
 			{% if balance_entries %}
 			<tbody>
 			{% for entry in balance_entries %}
 				<tr>
-					<td>{{ entry.balance_id }}</td>
+					<td>{{ loop.index }}</td>
 					<td>{{ entry.payee }}</td>
 					<td>{{ entry.payer }}</td>
 					<td>{{ entry.amount }}</td>
-					<td><a href="/balance/edit/{{ entry.balance_id }}">Edit</a></td>
-					<td><a href="/balance/delete/{{ entry.balance_id }}">Delete</a></td>
 				</tr>
 			{% endfor %}
 			</tbody>
 		</table>
 			{% else %}
 		</table>
-		You have no entries yet
+		<p>You currently have no balances</p>
 			{% endif %}
-			<br/><br/><b><a id="actions" href="/balance/add">Add new entry</a></b>
 {% endblock %}

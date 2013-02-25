@@ -5,12 +5,14 @@
 # this is due to performance considerations  #
 ##############################################
 from google.appengine.ext import ndb
+from helpers import thousand_separator
 
 class User(ndb.Model):
 	user_id = ndb.StringProperty()
 	email = ndb.StringProperty()
 	firstname = ndb.StringProperty()
 	lastname = ndb.StringProperty()
+	password = ndb.StringProperty()
 	join_date = ndb.DateTimeProperty()
 
 	# data transfer object to form JSON
@@ -34,7 +36,7 @@ class Balance(ndb.Model):
 				balance_id = self.balance_id,
 				payee = self.payee,
 				payer = self.payer,
-				amount = self.amount)
+				amount = thousand_separator(int(self.amount)))
 
 class Transactions(ndb.Model):
 	transactions_id = ndb.StringProperty()
@@ -48,7 +50,7 @@ class Transactions(ndb.Model):
 	def dto(self):
 		return dict(
 				transactions_id = self.transactions_id,
-				amount = self.amount,
+				amount = thousand_separator(int(self.amount)),
 				payee = self.payee,
 				payer = self.payer,
 				description = self.description,

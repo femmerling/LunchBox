@@ -1,0 +1,32 @@
+{% extends "base_login.html" %}
+{% block content %}
+		<h1>The home view.</h1>
+		<p>Hi {{user.firstname}}!</p>
+		{% if not payer and not payee %}
+		you owe nobody no money and nobody owes you no money
+		{% else %}
+			{% if payer %}
+			<p>Friends you owe money to:</p>
+			<ul>
+				{% for entry in payer %}
+				<li><a href="/pay/to/{{entry.payee}}">{{entry.payee}}</a> - {{entry.amount}}</li>
+				{% endfor %}
+			</ul>
+			{% else %}
+			You owe nobody no money
+			{% endif%}
+			{% if payee %}
+			<p>Friends who owe you money:</p>
+			<ul>
+				{% for entry in payee %}
+				<li>{{entry.payer}} - {{entry.amount}}</li>
+				{% endfor %}
+			</ul>
+			{% else %}
+			Nobody owes you no money
+			{% endif%}
+		{% endif %}
+
+		<br/><br/><a id="actions" href="/transactions/add">New Deposit</a>
+		
+{% endblock %}

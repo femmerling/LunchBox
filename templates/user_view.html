@@ -1,22 +1,23 @@
-{% extends "base.html" %}
+{% extends "base_login.html" %}
 {% block content %}
-		<h1>View User single entry.</h1>
+		<h2>User Profile</h2>
 		<table>
 				<tr>
-					<td>Email:</td>
-					<td>{{ user_item.email }}</td>
+					<td>Email</td>
+					<td>: {{ user.email }}</td>
 				</tr>
 				<tr>
-					<td>Firstname:</td>
-					<td>{{ user_item.firstname }}</td>
+					<td>First name</td>
+					<td>: {{ user.firstname }}</td>
 				</tr>
 				<tr>
-					<td>Lastname:</td>
-					<td>{{ user_item.lastname }}</td>
+					<td>Last name</td>
+					<td>: {{ user.lastname }}</td>
 				</tr>
 				<tr>
-					<td>Join_Date:</td>
-					<td>{{ user_item.join_date }}</td>
+					<td>Lunchbox since</td>
+					<td>: {{ user.join_date }}</td>
 				</tr>
 		</table>
+		<br/><a id="actions" href="/user/edit/{{user.user_id}}">Edit Profile</a>
 {% endblock %}
