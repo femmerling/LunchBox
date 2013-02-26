@@ -12,9 +12,9 @@ from flask import url_for
 from flask import session
 from flask import request
 from flask import render_template
-from flask import abort
-from flask import flash
-from flask import get_flashed_messages
+#from flask import abort
+#from flask import flash
+#from flask import get_flashed_messages
 from flask import json
 
 # data model imports
@@ -23,7 +23,7 @@ from models import User, Balance, Transactions
 # you can freely change the lines below
 
 # package imports
-import logging
+#import logging
 import hashlib
 from datetime import datetime
 from helpers import generate_key
@@ -31,7 +31,6 @@ from helpers import generate_key
 # google api and library imports
 from google.appengine.api import taskqueue, images, mail, urlfetch
 from google.appengine.ext import ndb
-from google.appengine.api.labs import taskqueue
 
 # global variables
 
@@ -64,7 +63,7 @@ def view_profile():
 	else:
 		return redirect(url_for('login_control'))
 
-@app.route('/register/process')
+@app.route('/register/process',methods=['GET','POST'])
 def register_process_controller():
 	email = request.values.get('email')
 	firstname = request.values.get('firstname')
@@ -144,7 +143,7 @@ def transactions_view_controller():
 @app.route('/transactions/add/')
 def transactions_add_controller():
 	#this is the controller to add new model entries
-	return render_template('transactions_add.html', title = "Add New Entry")
+	return render_template('transactions_add.html', title = "Add New Transaction")
 
 @app.route('/transactions/create/',methods=['POST','GET'])
 def transactions_create_data_controller():
@@ -215,7 +214,7 @@ def transactions_create_data_controller():
 									)
 				new_balance.put()
 		
-		return redirect(url_for('home_control'))
+		return redirect(url_for('home_control',msg="Deposit done"))
 	
 	else:
 		return redirect(url_for('login_control'))
@@ -234,6 +233,8 @@ def login_control():
 		if check_user:
 			session['user'] = check_user.dto()
 			return redirect(url_for('home_control'))
+		else:
+			return render_template('login.html',msg="User does not exist")
 	else:
 		return render_template('login.html')
 
@@ -267,6 +268,81 @@ def home_control():
 def register_control():
 	# add your controller here
 	return render_template('register.html')
+
+@app.route('/pay/friend', methods=['GET','POST'])
+def pay_friend_control():
+	if 'user' in session:
+		if request.method == 'POST':
+			payer = session['user']['email']
+			payee = request.values.get('email')
+			amount = float(request.values.get('amount'))
+			description = request.values.get('description')
+			transactions_new_id = generate_key()
+
+			new_transactions = Transactions(
+										transactions_id = transactions_new_id,
+										amount = amount,
+										payee = payee,
+										payer = payer,
+										description = description,
+										transaction_time = datetime.now()
+									)
+			new_transactions.put()
+
+			balance_to_pay = Balance.query(Balance.payee == payee, Balance.payer == payer).get()
+			if balance_to_pay:
+				if amount > balance_to_pay.amount:
+					delta = amount - balance_to_pay.amount
+					balance_to_pay.amount = 0
+					Balance.put(balance_to_pay)
+					amount = delta
+				elif amount < balance_to_pay.amount:
+					balance_to_pay.amount -= amount
+					Balance.put(balance_to_pay)
+					amount = 0
+				else:
+					balance_to_pay.amount = 0
+					Balance.put(balance_to_pay)
+					amount = 0
+				if amount > 0:
+					balance_new_id = generate_key()
+					new_balance = Balance(
+									balance_id = balance_new_id,
+									payee = payer,
+									payer = payee,
+									amount = float(amount)
+								)
+					new_balance.put()
+
+					transactions_new_id = generate_key()
+					new_transactions = Transactions(
+											transactions_id = transactions_new_id,
+											amount = amount,
+											payee = payer,
+											payer = payee,
+											description = "Payment Excess Treated as deposit",
+											transaction_time = datetime.now()
+										)
+					new_transactions.put()
+			else:
+				check_vice_versa = Balance.query(Balance.payee == payer, Balance.payer == payee).get()
+				if check_vice_versa:
+					check_vice_versa.amount += amount
+					Balance.put(check_vice_versa)
+				else:
+					balance_new_id = generate_key()
+					new_balance = Balance(
+									balance_id = balance_new_id,
+									payee = payer,
+									payer = payee,
+									amount = float(amount)
+								)
+					new_balance.put()	
+			return redirect(url_for('home_control',msg="Payment Done"))
+		else:
+			return render_template('pay_a_friend.html')
+	else:
+		return redirect(url_for('login_control'))
 
 @app.route('/pay/to/<email>',methods=['POST','GET'])
 def pay_to_friend(email):
@@ -336,7 +412,7 @@ def pay_to_friend(email):
 								amount = float(amount)
 							)
 				new_balance.put()	
-		return redirect(url_for('home_control'))
+		return redirect(url_for('home_control',msg="Payment Done!"))
 	else:
 		payer = session['user']['email']
 		balance_detail = Balance.query(Balance.payer == payer, Balance.payee == email).get()

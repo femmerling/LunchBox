@@ -1,6 +1,9 @@
 {% extends "base_login.html" %}
 {% block content %}
 		<h1>The home view.</h1>
+		{% if msg %}
+		<p style="color:red;font-weight:bold;">{{msg}}</p>
+		{% endif %}
 		<p>Hi {{user.firstname}}!</p>
 		{% if not payer and not payee %}
 		you owe nobody no money and nobody owes you no money
@@ -24,9 +27,9 @@
 			</ul>
 			{% else %}
 			Nobody owes you no money
-			{% endif%}
+			{% endif %}
 		{% endif %}
 
-		<br/><br/><a id="actions" href="/transactions/add">New Deposit</a>
+		<br/><br/><a id="actions" href="/transactions/add">New Deposit</a> <a id="actions" href="/pay/friend">Pay Friend</a>
 		
 {% endblock %}

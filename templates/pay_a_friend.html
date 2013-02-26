@@ -1,14 +1,14 @@
 {% extends "base_login.html" %}
 {% block content %}
-		<h2>Add a new bill</h2>
-		<form name="transactions_add" id="transactions_add" method="post" action="/transactions/create/">
+		<h2>Pay Your friend!</h2>
+		<form id="pay_friend" name="pay_friend" method="post" action="/pay/friend">
 		<table>
 				<tr>
 					<td>Friend's Email:</td>
-					<td><input type="text" name="payee"/></td>
+					<td><input type="text" name="email"/></td>
 				</tr>
 				<tr>
-					<td>Amount:</td>
+					<td>Amount to pay:</td>
 					<td><input type="text" name="amount"/></td>
 				</tr>
 				<tr>
@@ -16,7 +16,7 @@
 					<td><input type="text" name="description"/></td>
 				</tr>
 				<tr>
-					<td><input id="transactionAdd" type="submit" name="submit" value="Add Entry"/></td>
+					<td><input type="submit" id="submitPayFriend" name="submit" value="Pay!"/></td>
 					<td> </td>
 				</tr>
 		</table>

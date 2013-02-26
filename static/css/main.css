@@ -11,6 +11,46 @@ a#actions{display: inline;height: 20px; width:100%;padding: 10px;color:#fff;back
 
 #list-view tbody td:last-of-type{border-right: 1px solid #ccc;}
 
+#spotlight{
+	position:fixed;
+	background: #eeeeee; /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  #eeeeee 0%, #eeeeee 33%, #999999 62%, #111111 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#eeeeee), color-stop(33%,#eeeeee), color-stop(62%,#999999), color-stop(100%,#111111)); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  #eeeeee 0%,#eeeeee 33%,#999999 62%,#111111 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  #eeeeee 0%,#eeeeee 33%,#999999 62%,#111111 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  #eeeeee 0%,#eeeeee 33%,#999999 62%,#111111 100%); /* IE10+ */
+	background: radial-gradient(center, ellipse cover,  #eeeeee 0%,#eeeeee 33%,#999999 62%,#111111 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#111111',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	opacity:0.65;
+	-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=65);
+	progid:DXImageTransform.Microsoft.Alpha(Opacity=65);
+	z-index:1000;
+	display:none;
+}
+
+#notification-space{
+	position:fixed;
+	height: 150px;
+	width: 370px;
+	z-index: 3000;
+	background: #fff;
+	-moz-box-shadow: 0 0 10px #333;
+	-webkit-box-shadow: 0 0 10px #333;
+	box-shadow: 0 0 10px #333;
+	padding: 15px;
+	display: none;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}
+
+#popClose{display: inline;height: 20px; width:100%;padding: 10px;color:#fff;background: #369;font-weight: normal;text-decoration: none;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;cursor: pointer;}*/
+
+
 
 
 

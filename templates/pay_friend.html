@@ -1,7 +1,7 @@
 {% extends "base_login.html" %}
 {% block content %}
 		<h2>Pay Your friend!</h2>
-		<form name="transactions_pay" method="post" action="/pay/to/{{balance.payee}}">
+		<form name="transactions_pay" id="transactions_pay" method="post" action="/pay/to/{{balance.payee}}">
 		<table>
 				<tr>
 					<td>Friend:</td>
@@ -20,7 +20,7 @@
 					<td><input type="text" name="description"/></td>
 				</tr>
 				<tr>
-					<td><input type="submit" name="submit" value="Pay!"/></td>
+					<td><input type="submit" id="submitPayTo" name="submit" value="Pay!"/></td>
 					<td> </td>
 				</tr>
 		</table>
