@@ -43,7 +43,7 @@ class Transactions(ndb.Model):
 	amount = ndb.FloatProperty()
 	payee = ndb.StringProperty()
 	payer = ndb.StringProperty()
-	description = ndb.StringProperty()
+	description = ndb.StringProperty(default="-")
 	transaction_time = ndb.DateTimeProperty()
 
 	# data transfer object to form JSON

@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.config.from_object('settings')
 
 # flask imports
-from flask import g
+#from flask import g
 from flask import redirect
 from flask import url_for
 from flask import session
@@ -23,16 +23,180 @@ from models import User, Balance, Transactions
 # you can freely change the lines below
 
 # package imports
-#import logging
+import logging
 import hashlib
 from datetime import datetime
-from helpers import generate_key
+from helpers import generate_key,thousand_separator
 
 # google api and library imports
-from google.appengine.api import taskqueue, images, mail, urlfetch
+from google.appengine.api import mail
 from google.appengine.ext import ndb
 
 # global variables
+def mail_on_pay(payer,payee,name,amount,detail):
+	mail_recipient = payee
+	mail_subject = "Your friend "+name+ " has recorded a new transaction on you!"
+	mail_body_admin = """
+	Dear """+payee+""",
+
+	Your friend """+name+""" has recorded a new transaction on you!
+
+	The detail is as follows:
+
+	Transaction amount: """+str(thousand_separator(int(amount)))+"""
+	Transaction purpose: """+ detail +"""
+	
+	Login to LunchBox to see your detail
+
+	thank you
+
+	LunchBox Team
+	http://ice-lunchbox.appspot.com
+	
+
+	automatic LunchBox notification system
+	"""
+	message_admin = mail.EmailMessage(
+	                sender  = 'LunchBox Administrator <emmerling@icehousecorp.com>',
+	                subject = mail_subject
+	              )
+	message_admin.to = mail_recipient
+	message_admin.body = mail_body_admin
+	message_admin.send()
+
+	self_recipient = payer
+	self_subject = "Reminder on deposit"
+	self_body = """
+	Dear """+payer+""",
+
+	this is to remind you of a your new transaction to """+ payee+"""
+
+	The detail is as follows:
+
+	Transaction amount: """+str(thousand_separator(int(amount)))+"""
+	Transaction purpose: """+ detail +"""
+	
+	Login to LunchBox to see your detail
+
+	thank you
+
+	LunchBox Team
+	http://ice-lunchbox.appspot.com
+	
+
+	automatic LunchBox notification system
+	"""
+	self_send = mail.EmailMessage(
+	                sender  = 'LunchBox Administrator <emmerling@icehousecorp.com>',
+	                subject = self_subject
+	              )
+	self_send.to = self_recipient
+	self_send.body = self_body
+	self_send.send()
+
+def mail_on_void(payer,payee,name,amount,detail):
+	mail_recipient = payee
+	mail_subject = "Your friend "+name+ " has voided a transaction!"
+	mail_body_admin = """
+	Dear """+payee+""",
+
+	Your friend """+name+""" has voided one of your transaction.
+
+	The detail is as follows:
+
+	Transaction amount: """+str(thousand_separator(int(amount)))+"""
+	Transaction purpose: """+ detail +"""
+	
+	Login to LunchBox to see your detail
+
+	thank you
+
+	LunchBox Team
+	http://ice-lunchbox.appspot.com
+	
+
+	automatic LunchBox notification system
+	"""
+	message_admin = mail.EmailMessage(
+	                sender  = 'LunchBox Administrator <emmerling@icehousecorp.com>',
+	                subject = mail_subject
+	              )
+	message_admin.to = mail_recipient
+	message_admin.body = mail_body_admin
+	message_admin.send()
+
+	self_recipient = payer
+	self_subject = "Reminder on deposit"
+	self_body = """
+	Dear """+payer+""",
+
+	this is to remind you that you have voided """+ payee+"""'s transaction'
+
+	The detail is as follows:
+
+	Transaction amount: """+str(thousand_separator(int(amount)))+"""
+	Transaction purpose: """+ detail +"""
+	
+	Login to LunchBox to see your detail
+
+	thank you
+
+	LunchBox Team
+	http://ice-lunchbox.appspot.com
+	
+
+	automatic LunchBox notification system
+	"""
+	self_send = mail.EmailMessage(
+	                sender  = 'LunchBox Administrator <emmerling@icehousecorp.com>',
+	                subject = self_subject
+	              )
+	self_send.to = self_recipient
+	self_send.body = self_body
+	self_send.send()
+
+def mail_on_register(email,first_name,last_name):
+	mail_recipient = email
+	mail_subject = "Welcome to ICE-Pin"
+	mail_body_admin = """
+	Dear """+first_name+""" """+last_name+""",
+
+	Welcome to ICE-Pin!
+
+	We hope that you enjoy using our app.
+
+	Your email """+email+""" is used as your username in this app.
+	
+	Login to LunchBox to see your detail.
+
+	Enjoy your time with LunchBox!
+
+	thank you
+
+	LunchBox Team
+	http://ice-lunchbox.appspot.com
+	
+
+	automatic LunchBox notification system
+	"""
+	message_admin = mail.EmailMessage(
+	                sender  = 'ICE-Pin Administrator <emmerling@icehousecorp.com>',
+	                subject = mail_subject
+	              )
+	message_admin.to = mail_recipient
+	message_admin.body = mail_body_admin
+	message_admin.send()
+
+	admin_notify_to = "emmerling@icehousecorp.com"
+	admin_body = "new user "+email+" have registered"
+	
+	send_admin = mail.EmailMessage(
+					sender  = 'ICE-Pin Administrator <emmerling@icehousecorp.com>',
+	                subject = "New Member Registered"
+				)
+	send_admin.to = admin_notify_to
+	send_admin.body = admin_body
+	send_admin.send()
 
 # home root controller
 @app.route('/')
@@ -85,7 +249,32 @@ def register_process_controller():
 
 	new_user.put()
 	session['user'] = new_user.dto()
+	mail_on_register(email,firstname,lastname)
 	return redirect(url_for('home_control'))
+
+@app.route('/mobile/register',methods=['GET','POST'])
+def mobile_register_process():
+	email = request.values.get('email')
+	firstname = request.values.get('firstname')
+	lastname = request.values.get('lastname')
+	password = request.values.get('password')
+	hasher = hashlib.sha256()
+	hasher.update(password)
+	password = hasher.hexdigest()
+	user_new_id = generate_key()
+
+	new_user = User(
+									user_id = user_new_id,
+									email = email,
+									firstname = firstname,
+									lastname = lastname,
+									password = password,
+									join_date = datetime.now()
+								)
+
+	new_user.put()
+	mail_on_register(email,firstname,lastname)
+	return str(new_user.dto())
 
 @app.route('/user/edit/<id>')
 def user_edit_controller(id):
@@ -130,15 +319,60 @@ def transactions_view_controller():
 	#this is the controller to view all data in the model
 	if "user" in session:
 		transactions_list = Transactions.query(ndb.OR(Transactions.payer==session['user']['email'],Transactions.payee==session['user']['email'])).fetch(10000)
-
+		friends = []
 		if transactions_list:
 			transactions_entries = [transactions.dto() for transactions in transactions_list]
+			for item in transactions_entries:
+				if item['payer'] != session['user']['email']:
+					if item['payer'] not in friends:
+						friends.append(item['payer'])
+				if item['payee'] != session['user']['email']:
+					if item['payee'] not in friends:
+						friends.append(item['payee'])
 		else:
 			transactions_entries = None
+		if len(friends) == 0:
+			friends = None
 
-		return render_template('transactions.html',transactions_entries = transactions_entries, title = "Transactions List")
+		return render_template('transactions.html',transactions_entries = transactions_entries, user_self=session['user']['email'],friends=friends, title = "Transactions List")
 	else:
 		return redirect(url_for('login_control'))
+
+@app.route('/void/<trans_id>')
+def void_trans(trans_id):
+	void_trans = Transactions.query(Transactions.transactions_id == trans_id).get()
+	payee = void_trans.payee
+	payer = void_trans.payer
+	amount = void_trans.amount
+	description = void_trans.description
+	update_balance = Balance.query(Balance.payee == payee, Balance.payer == payer).get()
+	result = update_balance.amount - amount
+	logging.error('### result')
+	logging.error(result)
+	if result >= 0:
+		update_balance.amount -= amount
+		Balance.put(update_balance)
+	else:
+		update_balance.amount = 0
+		Balance.put(update_balance)
+		result_balance = abs(result)
+		balance_new_id = generate_key()
+		check_vice_versa = Balance.query(Balance.payee == payer, Balance.payer == payee).get()
+		if check_vice_versa:
+			check_vice_versa.amount += result_balance
+			Balance.put(check_vice_versa)
+		else:
+			new_balance = Balance(
+								balance_id = balance_new_id,
+								payee = payer,
+								payer = payee,
+								amount = result_balance
+							)
+			new_balance.put()
+	void_trans.key.delete()
+	name=session['user']['firstname']+" " +session['user']['lastname']
+	mail_on_void(payer,payee,name,amount,description)
+	return redirect(url_for('transactions_view_controller'))
 
 @app.route('/transactions/add/')
 def transactions_add_controller():
@@ -153,6 +387,8 @@ def transactions_create_data_controller():
 		payee = request.values.get('payee')
 		payer = session['user']['email']
 		description = request.values.get('description')
+		if description == "":
+			description = " "
 
 		transactions_new_id = generate_key()
 
@@ -166,6 +402,8 @@ def transactions_create_data_controller():
 									)
 
 		new_transactions.put()
+		name=session['user']['firstname']+" " +session['user']['lastname']
+		mail_on_pay(payer,payee,name,amount,description)
 
 		balance_check = Balance.query(Balance.payer == payer, Balance.payee == payee).get()
 		if balance_check:
@@ -238,6 +476,19 @@ def login_control():
 	else:
 		return render_template('login.html')
 
+@app.route('/mobile/login', methods=['GET','POST']) #Link
+def mobile_login_control():
+	email = request.values.get('email')
+	password = request.values.get('password')
+	hasher = hashlib.sha256()
+	hasher.update(password)
+	password = hasher.hexdigest()
+	check_user = User.query(User.email == email, User.password == password).get()
+	if check_user:
+		return str(check_user.dto())
+	else:
+		return "failed"
+
 @app.route('/logout')
 def logout_control():
 	session.pop('user',None)
@@ -277,6 +528,8 @@ def pay_friend_control():
 			payee = request.values.get('email')
 			amount = float(request.values.get('amount'))
 			description = request.values.get('description')
+			if description == "":
+				description = " "
 			transactions_new_id = generate_key()
 
 			new_transactions = Transactions(
@@ -288,6 +541,9 @@ def pay_friend_control():
 										transaction_time = datetime.now()
 									)
 			new_transactions.put()
+			
+			name=session['user']['firstname']+" " +session['user']['lastname']
+			mail_on_pay(payer,payee,name,amount,description)
 
 			balance_to_pay = Balance.query(Balance.payee == payee, Balance.payer == payer).get()
 			if balance_to_pay:
@@ -350,6 +606,8 @@ def pay_to_friend(email):
 		payer = session['user']['email']
 		amount = float(request.values.get('amount'))
 		description = request.values.get('description')
+		if description == "":
+			description = " "
 		transactions_new_id = generate_key()
 
 		new_transactions = Transactions(
@@ -362,6 +620,9 @@ def pay_to_friend(email):
 									)
 
 		new_transactions.put()
+
+		name=session['user']['firstname']+" " +session['user']['lastname']
+		mail_on_pay(payer,email,name,amount,description)
 
 		balance_to_pay = Balance.query(Balance.payee == email, Balance.payer == payer).get()
 		if balance_to_pay:

@@ -4,26 +4,37 @@
 		<table id="list-view">
 			<thead>
 				<tr>
-					<td><b></td>
 					<td><b>Amount</b></td>
 					<td><b>Payee</b></td>
 					<td><b>Payer</b></td>
 					<td><b>Description</b></td>
 					<td><b>Transaction Time</b></td>
+					<td> </td>
 				</tr>
 			</thead>
 			{% if transactions_entries %}
 			<tbody>
-			{% for entry in transactions_entries %}
+				{% for item in friends %}
 				<tr>
-					<td>{{ loop.index }}</td>
+					<td colspan="6"><b>{{item}}</b></td>
+				</tr>
+				{% for entry in transactions_entries %}
+				{% if entry.payee == item or entry.payer == item %}
+				<tr>
 					<td>{{ entry.amount }}</td>
 					<td>{{ entry.payee }}</td>
 					<td>{{ entry.payer }}</td>
 					<td>{{ entry.description }}</td>
 					<td>{{ entry.transaction_time }}</td>
+					<td> 
+						{% if user_self == entry.payer %}
+						<a href="/void/{{entry.transactions_id}}">void transaction</a>
+						{% endif %}
+					</td>
 				</tr>
-			{% endfor %}
+				{% endif %}
+				{% endfor %}
+				{% endfor %}
 			</tbody>
 		</table>
 			{% else %}

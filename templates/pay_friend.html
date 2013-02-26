@@ -1,6 +1,6 @@
 {% extends "base_login.html" %}
 {% block content %}
-		<h2>Pay Your friend!</h2>
+		<h2>Use Deposit</h2>
 		<form name="transactions_pay" id="transactions_pay" method="post" action="/pay/to/{{balance.payee}}">
 		<table>
 				<tr>
@@ -8,11 +8,11 @@
 					<td>{{ balance.payee }}</td>
 				</tr>
 				<tr>
-					<td>Amount Owed:</td>
+					<td>Deposit Left:</td>
 					<td>{{ balance.amount }}</td>
 				</tr>
 				<tr>
-					<td>Amount to pay:</td>
+					<td>Amount to use:</td>
 					<td><input type="text" name="amount"/></td>
 				</tr>
 				<tr>
@@ -20,7 +20,7 @@
 					<td><input type="text" name="description"/></td>
 				</tr>
 				<tr>
-					<td><input type="submit" id="submitPayTo" name="submit" value="Pay!"/></td>
+					<td><input type="submit" id="submitPayTo" name="submit" value="Use it!"/></td>
 					<td> </td>
 				</tr>
 		</table>
